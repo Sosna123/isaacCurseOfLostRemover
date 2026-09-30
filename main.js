@@ -37,7 +37,7 @@ function createTable(rows, columns) {
                 mapHTML += `<td class='roomTd' onclick='handleClick(${i}, ${j}, "left")' oncontextmenu='handleClick(${i}, ${j}, "right", event)'></td>`;
                 rowArray.push("normal");
             } else {
-                mapHTML += `<td onclick='handleClick(${i}, ${j}, "left")' oncontextmenu='handleClick(${i}, ${j}, "right", event)'></td>`;
+                mapHTML += `<td class='roomEmptyTd' onclick='handleClick(${i}, ${j}, "left")' oncontextmenu='handleClick(${i}, ${j}, "right", event)'></td>`;
                 rowArray.push("");
             }
         }
@@ -55,7 +55,7 @@ function updateTable() {
     for (let i = 0; i < map.length; i++) {
         mapHTML += "<tr>";
         for (let j = 0; j < map[i].length; j++) {
-            let roomIdClass = map[i][j] == "" ? "" : "class='roomTd'";
+            let roomIdClass = map[i][j] == "" ? "class='roomEmptyTd'" : "class='roomTd'";
 
             mapHTML += `<td ${roomIdClass} onclick='handleClick(${i}, ${j}, "left")' oncontextmenu='handleClick(${i}, ${j}, "right", event)'>`;
 
@@ -86,9 +86,17 @@ function createMenu() {
     menuHTML = "";
 
     for (let i = 0; i < roomTypes.length; i++) {
+        if (i % 2 == 0) {
+            menuHTML += "<div class='roomTypeRow'>";
+        }
+
         menuHTML += `<div class='roomTypeButton' onclick='changeSelectedRoomType(\"${roomTypes[i]}\")'>`;
         menuHTML += i == 0 ? "normal room" : `<img draggable='false' src='./imgs/${roomTypes[i]}.webp'></img>`;
         menuHTML += "</div>";
+
+        if (i % 2 != 0) {
+            menuHTML += "</div>";
+        }
     }
 
     clickMenu.innerHTML = menuHTML;

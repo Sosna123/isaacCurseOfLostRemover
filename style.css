@@ -1,5 +1,45 @@
+/* body */
+@font-face {
+    font-family: "upheaval";
+    src: url(./upheaval.ttf);
+}
+
+body {
+    font-family: "upheaval", sans-serif;
+    background-color: burlywood;
+}
+
+/* top heading */
+#heading {
+    width: 1000px;
+    display: flex;
+    justify-content: space-evenly;
+    margin: auto;
+}
+
+#heading h1 {
+    font-size: 48px;
+}
+
+#heading img {
+    width: 100px;
+    height: 100px;
+}
+
+/* content container */
+#container {
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    justify-content: center;
+}
+
+/* table */
 #mapTable {
     display: block;
+    border: 1px solid black;
+    border-collapse: collapse;
+    height: auto;
 }
 
 #mapTable td {
@@ -15,39 +55,42 @@
     background-color: #7b7b7b;
 }
 
+.roomEmptyTd {
+    background-color: #393831;
+}
+
 .imgTd {
     width: 100%;
 }
 
+/* menu */
 #clickMenu {
-    height: 90vh;
-    overflow-y: scroll;
+    overflow: hidden scroll;
+}
+
+.roomTypeRow {
+    display: flex;
+    height: 75px;
+    width: 150px;
 }
 
 .roomTypeButton {
-    width: 100px;
-    height: 100px;
+    width: 75px;
+    height: 75px;
     border: 1px solid black;
-    margin: 0 10px;
     background-color: #7b7b7b;
     color: white;
     text-align: center;
     font-size: 24px;
     user-select: none;
-
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
+    font-size: 18px;
 }
 
 .roomTypeButton>img {
     user-select: none;
     width: 100%;
-}
-
-#container {
-    display: flex;
-    width: 100%;
-    height: 100vh;
-    justify-content: space-around;
 }
