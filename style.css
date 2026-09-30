@@ -64,10 +64,6 @@ body {
 }
 
 /* menu */
-#clickMenu {
-    overflow: hidden scroll;
-}
-
 .roomTypeRow {
     display: flex;
     height: 75px;
