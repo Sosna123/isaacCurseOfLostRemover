@@ -26,84 +26,117 @@ let roomTypes = [
 ];
 let currentRoomType = "normal";
 
+function createTdElement(roomType, row, column) {
+    const td = document.createElement("td");
+    td.setAttribute("--data-coords-x", row);
+    td.setAttribute("--data-coords-y", column);
+
+    if (roomType == "") {
+        td.classList.add("roomEmptyTd");
+    } else if (roomType == "normal") {
+        td.classList.add("roomTd");
+    } else {
+        td.classList.add("roomTd");
+
+        let img = document.createElement("img");
+        img.setAttribute("draggable", "false");
+        img.setAttribute("src", roomType);
+        img.classList.add("imgTd");
+        td.appendChild(img);
+    }
+
+    td.addEventListener("mouseup", (event) => {
+        handleClick(row, column, event);
+    });
+
+    td.addEventListener("contextmenu", (event) => {
+        handleClick(row, column, event);
+        event.preventDefault();
+    });
+    return td;
+}
+
 function createTable(rows, columns) {
-    let mapHTML = "";
     for (let i = 0; i < rows; i++) {
         let rowArray = [];
-        mapHTML += "<tr>";
+        const tr = document.createElement("tr");
 
         for (let j = 0; j < columns; j++) {
             if (i == 6 && j == 6) {
-                mapHTML += `<td class='roomTd' onclick='handleClick(${i}, ${j}, "left")' oncontextmenu='handleClick(${i}, ${j}, "right", event)'></td>`;
                 rowArray.push("normal");
+                let td = createTdElement("normal", i, j);
+                tr.appendChild(td);
             } else {
-                mapHTML += `<td class='roomEmptyTd' onclick='handleClick(${i}, ${j}, "left")' oncontextmenu='handleClick(${i}, ${j}, "right", event)'></td>`;
                 rowArray.push("");
+                let td = createTdElement("", i, j);
+                tr.appendChild(td);
             }
         }
 
-        mapHTML += "</tr>";
+        mapTable.appendChild(tr);
         map.push(rowArray);
     }
-
-    mapTable.innerHTML = mapHTML;
 }
 
-function updateTable() {
-    let mapHTML = "";
+function updateWholeTable() {
+    mapTable.innerHTML = "";
 
     for (let i = 0; i < map.length; i++) {
-        mapHTML += "<tr>";
+        const tr = document.createElement("tr");
         for (let j = 0; j < map[i].length; j++) {
-            let roomIdClass = map[i][j] == "" ? "class='roomEmptyTd'" : "class='roomTd'";
-
-            mapHTML += `<td ${roomIdClass} onclick='handleClick(${i}, ${j}, "left")' oncontextmenu='handleClick(${i}, ${j}, "right", event)'>`;
-
-            if (map[i][j] == "normal" || map[i][j] == "") {
-                mapHTML += "";
-            } else {
-                mapHTML += `<img draggable='false' src='./imgs/${map[i][j]}.webp' class='imgTd'></img>`;
-            }
-
-            mapHTML += "</td>";
+            tr.appendChild(createTdElement(map[i][j], i, j));
         }
-        mapHTML += "</tr>";
+        mapTable.appendChild(tr);
     }
-
-    mapTable.innerHTML = mapHTML;
 }
 
-function handleClick(x, y, mouseBtn, event) {
-    map[x][y] = mouseBtn == "left" ? currentRoomType : "";
-    updateTable();
+function handleClick(x, y, event) {
+    // event.button == 0 - left
+    // event.button == 1 - scroll
+    // event.button == 2 - right
 
-    if (mouseBtn == "right") {
-        event.preventDefault();
+    if (event.button == 0) {
+        map[x][y] = currentRoomType;
+    } else if (event.button == 2) {
+        map[x][y] = "";
     }
+
+    updateWholeTable();
 }
 
 function createMenu() {
-    menuHTML = "";
+    let rowDiv = document.createElement("div");
+    rowDiv.classList.add("roomTypeRow");
 
     for (let i = 0; i < roomTypes.length; i++) {
-        if (i % 2 == 0) {
-            menuHTML += "<div class='roomTypeRow'>";
+        const roomType = roomTypes[i];
+
+        const div = document.createElement("div");
+        div.classList.add("roomTypeButton");
+        div.addEventListener("click", () => {
+            currentRoomType = roomType;
+        });
+
+        if (roomType == "normal") {
+            div.innerText = "NORMAL ROOM";
+        } else {
+            const img = document.createElement("img");
+            img.setAttribute("draggable", "false");
+            img.setAttribute("src", `./imgs/${roomTypes[i]}.webp`);
+
+            div.appendChild(img);
         }
 
-        menuHTML += `<div class='roomTypeButton' onclick='changeSelectedRoomType(\"${roomTypes[i]}\")'>`;
-        menuHTML += i == 0 ? "normal room" : `<img draggable='false' src='./imgs/${roomTypes[i]}.webp'></img>`;
-        menuHTML += "</div>";
+        if (i % 2 == 0) {
+            rowDiv.appendChild(div);
+        } else {
+            rowDiv.appendChild(div);
+            clickMenu.appendChild(rowDiv);
 
-        if (i % 2 != 0) {
-            menuHTML += "</div>";
+            rowDiv = document.createElement("div");
+            rowDiv.classList.add("roomTypeRow");
         }
     }
-
-    clickMenu.innerHTML = menuHTML;
-}
-
-function changeSelectedRoomType(roomType) {
-    currentRoomType = roomType;
 }
 
 // init
