@@ -1,5 +1,6 @@
 const mapTable = document.querySelector("#mapTable");
 const clickMenu = document.querySelector("#clickMenu");
+const gridSize = 13;
 
 let map = [];
 let roomTypes = [
@@ -25,34 +26,68 @@ let roomTypes = [
     "error",
 ];
 let currentRoomType = "normal";
+let draggedCells = [];
 
-function createTdElement(roomType, row, column) {
+function createTdElement(mapObj, row, column) {
     const td = document.createElement("td");
     td.setAttribute("--data-coords-x", row);
     td.setAttribute("--data-coords-y", column);
 
-    if (roomType == "") {
+    if (mapObj.type == "") {
         td.classList.add("roomEmptyTd");
-    } else if (roomType == "normal") {
+    } else if (mapObj.type == "normal") {
         td.classList.add("roomTd");
     } else {
         td.classList.add("roomTd");
 
         let img = document.createElement("img");
         img.setAttribute("draggable", "false");
-        img.setAttribute("src", roomType);
+        img.setAttribute("src", `./imgs/${mapObj.type}.webp`);
         img.classList.add("imgTd");
         td.appendChild(img);
     }
 
+    td.addEventListener("mouseover", (event) => {
+        if (event.button == 0 && event.buttons >= 1) {
+            dragCells(td, row, column);
+        }
+        if (event.button == 2 && event.buttons >= 1) {
+            handleClick(row, column, event);
+        }
+    });
+
+    td.addEventListener("mousedown", (event) => {
+        if (draggedCells.length == 0 && event.button == 0) {
+            handleDragCells();
+        }
+    });
+
     td.addEventListener("mouseup", (event) => {
-        handleClick(row, column, event);
+        if (draggedCells.length > 1 && event.button == 0) {
+            handleDragCells();
+        } else {
+            handleClick(row, column, event);
+        }
     });
 
     td.addEventListener("contextmenu", (event) => {
         handleClick(row, column, event);
         event.preventDefault();
     });
+
+    if (mapObj.borders[0] == 0) {
+        td.style.borderTop = "0px solid black";
+    }
+    if (mapObj.borders[1] == 0) {
+        td.style.borderLeft = "0px solid black";
+    }
+    if (mapObj.borders[2] == 0) {
+        td.style.borderBottom = "0px solid black";
+    }
+    if (mapObj.borders[3] == 0) {
+        td.style.borderRight = "0px solid black";
+    }
+
     return td;
 }
 
@@ -63,12 +98,22 @@ function createTable(rows, columns) {
 
         for (let j = 0; j < columns; j++) {
             if (i == 6 && j == 6) {
-                rowArray.push("normal");
-                let td = createTdElement("normal", i, j);
+                let tdInfo = {
+                    type: "normal",
+                    borders: [1, 1, 1, 1],
+                };
+
+                rowArray.push(tdInfo);
+                let td = createTdElement(tdInfo, i, j);
                 tr.appendChild(td);
             } else {
-                rowArray.push("");
-                let td = createTdElement("", i, j);
+                let tdInfo = {
+                    type: "",
+                    borders: [1, 1, 1, 1],
+                };
+
+                rowArray.push(tdInfo);
+                let td = createTdElement(tdInfo, i, j);
                 tr.appendChild(td);
             }
         }
@@ -84,7 +129,9 @@ function updateWholeTable() {
     for (let i = 0; i < map.length; i++) {
         const tr = document.createElement("tr");
         for (let j = 0; j < map[i].length; j++) {
-            tr.appendChild(createTdElement(map[i][j], i, j));
+            const td = createTdElement(map[i][j], i, j);
+
+            tr.appendChild(td);
         }
         mapTable.appendChild(tr);
     }
@@ -95,13 +142,76 @@ function handleClick(x, y, event) {
     // event.button == 1 - scroll
     // event.button == 2 - right
 
-    if (event.button == 0) {
-        map[x][y] = currentRoomType;
+    if (event == null || event.button == 0) {
+        map[x][y].type = currentRoomType;
     } else if (event.button == 2) {
-        map[x][y] = "";
+        map[x][y].type = "";
     }
 
     updateWholeTable();
+}
+
+function dragCells(element, row, column) {
+    element.classList.add("roomDraggedTd");
+
+    draggedCells.push({
+        element,
+        row,
+        column,
+    });
+}
+
+function handleDragCells() {
+    let draggedCellsCords = [];
+    for (let i = 0; i < draggedCells.length; i++) {
+        const element = draggedCells[i].element;
+        const row = draggedCells[i].row;
+        const column = draggedCells[i].column;
+
+        let isUnique = true;
+        draggedCellsCords.forEach((el) => {
+            if (el.row == row && el.column == column) {
+                isUnique = false;
+            }
+        });
+
+        if (isUnique) {
+            draggedCellsCords.push({ row, column });
+        }
+
+        element.classList.remove("roomDraggedTd");
+    }
+
+    for (let i = 0; i < draggedCells.length; i++) {
+        const element = draggedCells[i].element;
+        const row = draggedCells[i].row;
+        const column = draggedCells[i].column;
+
+        map[row][column].type = currentRoomType;
+
+        draggedCellsCords.forEach((el) => {
+            // cell o 1 u góry
+            if (column == el.column && row >= 1 && row - 1 == el.row) {
+                map[row][column].borders[0] = 0;
+                console.log("cell o 1 u góry");
+            }
+            // cell o 1 w prawo
+            if (row == el.row && column >= 1 && column - 1 == el.column) {
+                map[row][column].borders[1] = 0;
+            }
+            // cell o 1 w dół
+            if (column == el.column && row <= gridSize - 1 && row + 1 == el.row) {
+                map[row][column].borders[2] = 0;
+            }
+            // cell o 1 w lewo
+            if (row == el.row && column <= gridSize - 1 && column + 1 == el.column) {
+                map[row][column].borders[3] = 0;
+            }
+        });
+    }
+
+    updateWholeTable();
+    draggedCells = [];
 }
 
 function createMenu() {
@@ -140,5 +250,5 @@ function createMenu() {
 }
 
 // init
-createTable(13, 13);
+createTable(gridSize, gridSize);
 createMenu();
