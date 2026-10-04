@@ -183,7 +183,6 @@ function handleDragCells() {
     }
 
     for (let i = 0; i < draggedCells.length; i++) {
-        const element = draggedCells[i].element;
         const row = draggedCells[i].row;
         const column = draggedCells[i].column;
 
@@ -191,20 +190,20 @@ function handleDragCells() {
 
         draggedCellsCords.forEach((el) => {
             // cell o 1 u góry
-            if (column == el.column && row >= 1 && row - 1 == el.row) {
+            if (column == el.column && row > 0 && row - 1 == el.row) {
                 map[row][column].borders[0] = 0;
                 console.log("cell o 1 u góry");
             }
             // cell o 1 w prawo
-            if (row == el.row && column >= 1 && column - 1 == el.column) {
+            if (row == el.row && column < gridSize - 1 && column + 1 == el.column) {
                 map[row][column].borders[1] = 0;
             }
             // cell o 1 w dół
-            if (column == el.column && row <= gridSize - 1 && row + 1 == el.row) {
+            if (column == el.column && row < gridSize - 1 && row + 1 == el.row) {
                 map[row][column].borders[2] = 0;
             }
             // cell o 1 w lewo
-            if (row == el.row && column <= gridSize - 1 && column + 1 == el.column) {
+            if (row == el.row && column > 0 && column - 1 == el.column) {
                 map[row][column].borders[3] = 0;
             }
         });
