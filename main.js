@@ -50,8 +50,7 @@ function createTdElement(mapObj, row, column) {
     td.addEventListener("mouseover", (event) => {
         if (event.button == 0 && event.buttons >= 1) {
             dragCells(td, row, column);
-        }
-        if (event.button == 2 && event.buttons >= 1) {
+        } else if (event.button == 2 && event.buttons >= 1) {
             handleClick(row, column, event);
         }
     });
@@ -144,11 +143,14 @@ function handleClick(x, y, event) {
 
     if (event == null || event.button == 0) {
         map[x][y].type = currentRoomType;
+        map[x][y].borders = [1, 1, 1, 1];
     } else if (event.button == 2) {
         map[x][y].type = "";
+        map[x][y].borders = [1, 1, 1, 1];
     }
 
     updateWholeTable();
+    draggedCells = [];
 }
 
 function dragCells(element, row, column) {
@@ -187,16 +189,16 @@ function handleDragCells() {
         const column = draggedCells[i].column;
 
         map[row][column].type = currentRoomType;
+        map[row][column].borders = [1, 1, 1, 1];
 
         draggedCellsCords.forEach((el) => {
             // cell o 1 u góry
             if (column == el.column && row > 0 && row - 1 == el.row) {
                 map[row][column].borders[0] = 0;
-                console.log("cell o 1 u góry");
             }
             // cell o 1 w prawo
             if (row == el.row && column < gridSize - 1 && column + 1 == el.column) {
-                map[row][column].borders[1] = 0;
+                map[row][column].borders[3] = 0;
             }
             // cell o 1 w dół
             if (column == el.column && row < gridSize - 1 && row + 1 == el.row) {
@@ -204,7 +206,7 @@ function handleDragCells() {
             }
             // cell o 1 w lewo
             if (row == el.row && column > 0 && column - 1 == el.column) {
-                map[row][column].borders[3] = 0;
+                map[row][column].borders[1] = 0;
             }
         });
     }
