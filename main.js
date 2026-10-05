@@ -48,16 +48,18 @@ function createTdElement(mapObj, row, column) {
     }
 
     td.addEventListener("mouseover", (event) => {
-        if (event.button == 0 && event.buttons >= 1) {
+        if (event.buttons == 1) {
             dragCells(td, row, column);
-        } else if (event.button == 2 && event.buttons >= 1) {
-            handleClick(row, column, event);
+        } else if (event.buttons == 2) {
+            handleClick(row, column, event.buttons);
         }
     });
 
     td.addEventListener("mousedown", (event) => {
         if (draggedCells.length == 0 && event.button == 0) {
             handleDragCells();
+        } else if (event.button == 2) {
+            handleClick(row, column, event.button);
         }
     });
 
@@ -65,7 +67,7 @@ function createTdElement(mapObj, row, column) {
         if (draggedCells.length > 1 && event.button == 0) {
             handleDragCells();
         } else {
-            handleClick(row, column, event);
+            handleClick(row, column, event.button);
         }
     });
 
@@ -136,15 +138,15 @@ function updateWholeTable() {
     }
 }
 
-function handleClick(x, y, event) {
+function handleClick(x, y, button) {
     // event.button == 0 - left
     // event.button == 1 - scroll
     // event.button == 2 - right
 
-    if (event == null || event.button == 0) {
+    if (button == null || button == 0) {
         map[x][y].type = currentRoomType;
         map[x][y].borders = [1, 1, 1, 1];
-    } else if (event.button == 2) {
+    } else if (button == 2) {
         map[x][y].type = "";
         map[x][y].borders = [1, 1, 1, 1];
     }
