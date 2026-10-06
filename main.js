@@ -1,7 +1,7 @@
 const mapTable = document.querySelector("#mapTable");
 const clickMenu = document.querySelector("#clickMenu");
 const gridSize = 13;
-const progressColors = ["rgba(0, 0, 0, 0)", "green", "orange", "red"];
+const progressColors = ["rgba(0, 0, 0, 0)", "orange", "red"];
 
 let map = [];
 let roomTypes = [
@@ -257,14 +257,13 @@ function createMenu() {
         div.addEventListener("click", () => {
             currentRoomType = roomType;
 
-            if (document.querySelector("#roomTypeButtonSelected")) {
-                document.querySelector("#roomTypeButtonSelected").id = "";
-            }
+            document.querySelector("#roomTypeButtonSelected").id = "";
             div.id = "roomTypeButtonSelected";
         });
 
         if (roomType == "normal") {
             div.innerText = "NORMAL ROOM";
+            div.id = "roomTypeButtonSelected";
         } else {
             const img = document.createElement("img");
             img.setAttribute("draggable", "false");
