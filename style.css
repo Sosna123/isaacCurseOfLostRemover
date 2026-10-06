@@ -74,8 +74,8 @@ body {
 .progressEl {
     display: block;
     position: absolute;
-    width: 7px;
-    height: 7px;
+    width: 10px;
+    height: 10px;
     right: 0;
     top: 0;
     z-index: 1;
@@ -104,7 +104,30 @@ body {
     font-size: 18px;
 }
 
+.roomTypeButton#roomTypeButtonSelected {
+    background-color: #a9a9a9;
+}
+
 .roomTypeButton>img {
     user-select: none;
     width: 100%;
+}
+
+/*  */
+
+#instructions {
+    font-size: 24px;
+    width: 75vw;
+    border-radius: 10px;
+    padding: 30px;
+    background-color: rgb(241, 210, 170);
+    margin: 20px auto;
+}
+
+#instructions>p {
+    margin-bottom: 10px;
+}
+
+#instructions>ul {
+    margin-top: 10px;
 }

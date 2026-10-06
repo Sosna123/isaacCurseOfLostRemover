@@ -235,7 +235,6 @@ function handleDragCells() {
 
 function changeProgress(row, column) {
     map[row][column].progress = (map[row][column].progress + 1) % progressColors.length;
-    console.log(map[row][column].progress);
     updateWholeTable();
 }
 
@@ -254,8 +253,14 @@ function createMenu() {
 
         const div = document.createElement("div");
         div.classList.add("roomTypeButton");
+
         div.addEventListener("click", () => {
             currentRoomType = roomType;
+
+            if (document.querySelector("#roomTypeButtonSelected")) {
+                document.querySelector("#roomTypeButtonSelected").id = "";
+            }
+            div.id = "roomTypeButtonSelected";
         });
 
         if (roomType == "normal") {
