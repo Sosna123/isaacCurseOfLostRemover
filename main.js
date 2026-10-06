@@ -1,6 +1,7 @@
 const mapTable = document.querySelector("#mapTable");
 const clickMenu = document.querySelector("#clickMenu");
 const gridSize = 13;
+const progressColors = ["rgba(0, 0, 0, 0)", "green", "orange", "red"];
 
 let map = [];
 let roomTypes = [
@@ -27,6 +28,7 @@ let roomTypes = [
 ];
 let currentRoomType = "normal";
 let draggedCells = [];
+let lastHoveredTd = [0, 0];
 
 function createTdElement(mapObj, row, column) {
     const td = document.createElement("td");
@@ -47,7 +49,14 @@ function createTdElement(mapObj, row, column) {
         td.appendChild(img);
     }
 
+    let progressDiv = document.createElement("div");
+    progressDiv.classList.add("progressEl");
+    progressDiv.style.backgroundColor = progressColors[mapObj.progress];
+    td.appendChild(progressDiv);
+
     td.addEventListener("mouseover", (event) => {
+        lastHoveredTd = [row, column];
+
         if (event.buttons == 1) {
             dragCells(td, row, column);
         } else if (event.buttons == 2) {
@@ -102,6 +111,7 @@ function createTable(rows, columns) {
                 let tdInfo = {
                     type: "normal",
                     borders: [1, 1, 1, 1],
+                    progress: 0,
                 };
 
                 rowArray.push(tdInfo);
@@ -111,6 +121,7 @@ function createTable(rows, columns) {
                 let tdInfo = {
                     type: "",
                     borders: [1, 1, 1, 1],
+                    progress: 0,
                 };
 
                 rowArray.push(tdInfo);
@@ -149,6 +160,7 @@ function handleClick(x, y, button) {
     } else if (button == 2) {
         map[x][y].type = "";
         map[x][y].borders = [1, 1, 1, 1];
+        map[x][y].progress = 0;
     }
 
     updateWholeTable();
@@ -192,6 +204,7 @@ function handleDragCells() {
 
         map[row][column].type = currentRoomType;
         map[row][column].borders = [1, 1, 1, 1];
+        map[row][column].progress = 0;
 
         draggedCellsCords.forEach((el) => {
             // cell o 1 u góry
@@ -216,6 +229,18 @@ function handleDragCells() {
     updateWholeTable();
     draggedCells = [];
 }
+
+function changeProgress(row, column) {
+    map[row][column].progress = (map[row][column].progress + 1) % progressColors.length;
+    console.log(map[row][column].progress);
+    updateWholeTable();
+}
+
+document.body.addEventListener("keyup", (event) => {
+    if (event.key == "p") {
+        changeProgress(...lastHoveredTd);
+    }
+});
 
 function createMenu() {
     let rowDiv = document.createElement("div");
