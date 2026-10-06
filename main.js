@@ -29,8 +29,13 @@ let roomTypes = [
 let currentRoomType = "normal";
 let draggedCells = [];
 let lastHoveredTd = [0, 0];
+let preventFakeClicking = false;
 
-function createTdElement(mapObj, row, column) {
+function createTdElement(row, column, mapObj) {
+    if (mapObj == undefined) {
+        mapObj = map[row][column];
+    }
+
     const td = document.createElement("td");
     td.setAttribute("--data-coords-x", row);
     td.setAttribute("--data-coords-y", column);
@@ -57,10 +62,15 @@ function createTdElement(mapObj, row, column) {
     td.addEventListener("mouseover", (event) => {
         lastHoveredTd = [row, column];
 
-        if (event.buttons == 1) {
-            dragCells(td, row, column);
-        } else if (event.buttons == 2) {
+        if (event.buttons == 2) {
             handleClick(row, column, event.buttons);
+            preventFakeClicking = true;
+        } else if (event.buttons == 1) {
+            if (preventFakeClicking) {
+                preventFakeClicking = false;
+            } else {
+                dragCells(td, row, column);
+            }
         }
     });
 
@@ -115,7 +125,7 @@ function createTable(rows, columns) {
                 };
 
                 rowArray.push(tdInfo);
-                let td = createTdElement(tdInfo, i, j);
+                let td = createTdElement(i, j, tdInfo);
                 tr.appendChild(td);
             } else {
                 let tdInfo = {
@@ -125,7 +135,7 @@ function createTable(rows, columns) {
                 };
 
                 rowArray.push(tdInfo);
-                let td = createTdElement(tdInfo, i, j);
+                let td = createTdElement(i, j, tdInfo);
                 tr.appendChild(td);
             }
         }
@@ -141,11 +151,30 @@ function updateWholeTable() {
     for (let i = 0; i < map.length; i++) {
         const tr = document.createElement("tr");
         for (let j = 0; j < map[i].length; j++) {
-            const td = createTdElement(map[i][j], i, j);
+            const td = createTdElement(i, j);
 
             tr.appendChild(td);
         }
         mapTable.appendChild(tr);
+    }
+}
+
+function updateOneTd(row, column) {
+    let appendElement = null;
+    if (column == 0) {
+        appendElement = document.querySelector(`tr:nth-child(${row + 1})`);
+    } else {
+        appendElement = document.querySelector(`td[--data-coords-x='${row}'][--data-coords-y='${column - 1}']`);
+    }
+
+    let oldTd = document.querySelector(`td[--data-coords-x='${row}'][--data-coords-y='${column}']`);
+    oldTd.remove();
+    let newTd = createTdElement(row, column);
+
+    if (column == 0) {
+        appendElement.prepend(newTd);
+    } else {
+        appendElement.after(newTd);
     }
 }
 
@@ -163,7 +192,7 @@ function handleClick(x, y, button) {
         map[x][y].progress = 0;
     }
 
-    updateWholeTable();
+    updateOneTd(x, y);
     draggedCells = [];
 }
 
@@ -226,14 +255,16 @@ function handleDragCells() {
         });
     }
 
-    updateWholeTable();
+    draggedCellsCords.forEach((el) => {
+        updateOneTd(el.row, el.column);
+    });
+
     draggedCells = [];
 }
 
 function changeProgress(row, column) {
     map[row][column].progress = (map[row][column].progress + 1) % progressColors.length;
-    console.log(map[row][column].progress);
-    updateWholeTable();
+    updateOneTd(row, column);
 }
 
 document.body.addEventListener("keyup", (event) => {
