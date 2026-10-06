@@ -102,6 +102,9 @@ function createTdElement(mapObj, row, column) {
 }
 
 function createTable(rows, columns) {
+    map = [];
+    mapTable.innerHTMl = "";
+
     for (let i = 0; i < rows; i++) {
         let rowArray = [];
         const tr = document.createElement("tr");
@@ -276,6 +279,73 @@ function createMenu() {
         }
     }
 }
+
+function moveWholeTable(direction) {
+    if (direction == "ArrowUp") {
+        map.shift();
+        let rowArray = [];
+
+        for (let i = 0; i < gridSize; i++) {
+            let tdInfo = {
+                type: "",
+                borders: [1, 1, 1, 1],
+                progress: 0,
+            };
+
+            rowArray.push(tdInfo);
+        }
+
+        map.push(rowArray);
+    } else if (direction == "ArrowDown") {
+        map.pop();
+        let rowArray = [];
+
+        for (let i = 0; i < gridSize; i++) {
+            let tdInfo = {
+                type: "",
+                borders: [1, 1, 1, 1],
+                progress: 0,
+            };
+
+            rowArray.push(tdInfo);
+        }
+
+        map.unshift(rowArray);
+    } else if (direction == "ArrowRight") {
+        map.forEach((el) => {
+            el.pop();
+
+            let tdInfo = {
+                type: "",
+                borders: [1, 1, 1, 1],
+                progress: 0,
+            };
+
+            el.unshift(tdInfo);
+        });
+    } else if (direction == "ArrowLeft") {
+        map.forEach((el) => {
+            el.shift();
+
+            let tdInfo = {
+                type: "",
+                borders: [1, 1, 1, 1],
+                progress: 0,
+            };
+
+            el.push(tdInfo);
+        });
+    }
+
+    updateWholeTable();
+}
+
+document.body.addEventListener("keydown", (event) => {
+    if (["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"].includes(event.key)) {
+        event.preventDefault();
+        moveWholeTable(event.key);
+    }
+});
 
 // init
 createTable(gridSize, gridSize);
